@@ -13,3 +13,6 @@ Smoothing path to more accurate shape
 
 ## Additional Content
 simple homing missle script  
+
+## License
+MIT
