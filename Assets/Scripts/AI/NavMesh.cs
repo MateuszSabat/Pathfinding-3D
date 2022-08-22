@@ -1,10 +1,10 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Threading;
 using System;
 
-namespace Pathfinding3D{
+namespace Pathfinding3D {
     public class NavMesh : MonoBehaviour
     {
         public LayerMask obstacleLayer;
@@ -53,6 +53,7 @@ namespace Pathfinding3D{
                     for (int z = 0; z < s.z; z++)
                     {
                         Vector3 pos = new Vector3(x, y, z) * nodeSize;
+                        pos = gridZeroCorner + pos; // include gridZeroCorner when setting node positions
                         Vector3 size = new Vector3(nodeSize, nodeSize, nodeSize) * .5f;
                         Node n = new Node(pos, size);
                         if (Physics.CheckBox(pos, size, Quaternion.identity, obstacleLayer))
@@ -184,12 +185,15 @@ namespace Pathfinding3D{
             Vector3Int s = new Vector3Int((int)(instance.gridSize.x / instance.nodeSize), (int)(instance.gridSize.y / instance.nodeSize), (int)(instance.gridSize.z / instance.nodeSize));
             int index(int x, int y, int z) // get index of node which position in grid is (x, y, z)
             {
-                if (x >= 0 && x < s.x && y >= 0 && y < s.y && z >= 0 && z < s.z)
+                if (x >= 0 && x < s.x && y >= 0 && y < s.y && z >= 0 && z < s.z) {
                     return z + y * s.z + x * s.y * s.z;
-                else
+                }
+                else {
                     return -1;
+                }
             }
-            Vector3Int gridPos = Vector3Int.RoundToInt(pos / instance.nodeSize);
+            Vector3 offsetPos = pos - instance.gridZeroCorner; // offset gridZeroCorner
+            Vector3Int gridPos = Vector3Int.RoundToInt(offsetPos / instance.nodeSize); // offset when calculating node positions
             int ind = index(gridPos.x, gridPos.y, gridPos.z);
             if (ind != -1 && instance.nodes[ind].ContainsPoint(pos))
                 {
